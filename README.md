@@ -2,5 +2,5 @@
 
 ## Team
 - Dylan Loree
--
+- Aaron Maagdenberg
 -
