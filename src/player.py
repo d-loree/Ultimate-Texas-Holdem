@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PLAYER_FILE = "player.json"
+PLAYER_FILE = "src/player.json"
 DEFAULT_CHIPS = int(os.getenv("DEFAULT_CHIPS", 10000))
 
 # Load player data from file or create default

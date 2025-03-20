@@ -1,5 +1,4 @@
 # Handles GUI elements
-
 import customtkinter as ctk
 from PIL import Image, ImageTk
 from src import player
@@ -10,9 +9,15 @@ main_frame = None
 settings_frame = None
 logo_ctk_image = None
 chips_var = None
+DEFAULT_CHIPS = player.DEFAULT_CHIPS
 
-# Show the requested frame and hide the others
+# Show the requested frame and hide the others (Also currently updates chips if on main menu)
 def show_frame(frame):
+    if frame == main_frame:
+        chips_var.set(f"Chips: {player.get_chips()}")
+    elif frame == settings_frame:
+        chips_var.set(str(player.get_chips()))
+
     main_frame.pack_forget()
     settings_frame.pack_forget()
     frame.pack(expand=True, fill="both", padx=20, pady=20)
@@ -32,7 +37,7 @@ def reset_chips_gui():
 
 # Create the main menu layout
 def create_main_menu():
-    global main_frame
+    global main_frame, chips_var
 
     main_frame = ctk.CTkFrame(root, fg_color="transparent")
     main_frame.pack(expand=True, fill="both", padx=20, pady=20)
@@ -43,7 +48,9 @@ def create_main_menu():
     title_label = ctk.CTkLabel(main_frame, text="Ultimate Texas Hold'em", font=("Arial", 28, "bold"))
     title_label.pack(pady=(0, 20))
 
-    chips_label = ctk.CTkLabel(main_frame, text=f"Chips: {player.get_chips()}", font=("Arial", 18))
+    # Single variable for both display & input
+    chips_var = ctk.StringVar(value=f"Chips: {player.get_chips()}")
+    chips_label = ctk.CTkLabel(main_frame, textvariable=chips_var, font=("Arial", 18))
     chips_label.pack(pady=(0, 30))
 
     start_button = ctk.CTkButton(main_frame, text="Start Game", font=("Arial", 16), corner_radius=10,
@@ -79,7 +86,7 @@ def create_settings_page():
     chips_label = ctk.CTkLabel(settings_frame, text="Chips:", font=("Arial", 16))
     chips_label.pack()
 
-    chips_var = ctk.StringVar(value=str(player.get_chips()))
+    chips_var.set(str(player.get_chips()))
     chips_entry = ctk.CTkEntry(settings_frame, textvariable=chips_var, font=("Arial", 16))
     chips_entry.pack(pady=10)
 
@@ -88,7 +95,7 @@ def create_settings_page():
                                 command=save_config_gui)
     save_button.pack(pady=10)
 
-    reset_button = ctk.CTkButton(settings_frame, text="Reset to 10K", font=("Arial", 16), corner_radius=10,
+    reset_button = ctk.CTkButton(settings_frame, text=f"Reset to {DEFAULT_CHIPS}", font=("Arial", 16), corner_radius=10,
                                  command=reset_chips_gui)
     reset_button.pack(pady=10)
 
@@ -118,6 +125,7 @@ def start_gui():
 
     create_main_menu()
     create_settings_page()
+
     # Show the main menu right away
     show_frame(main_frame)
 
