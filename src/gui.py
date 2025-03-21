@@ -7,6 +7,7 @@ from src import player
 root = None
 main_frame = None
 settings_frame = None
+game_frame = None
 logo_ctk_image = None
 chips_var = None
 DEFAULT_CHIPS = player.DEFAULT_CHIPS
@@ -20,6 +21,7 @@ def show_frame(frame):
 
     main_frame.pack_forget()
     settings_frame.pack_forget()
+    game_frame.pack_forget()
     frame.pack(expand=True, fill="both", padx=20, pady=20)
 
 # Toggle dark/light mode
@@ -54,7 +56,7 @@ def create_main_menu():
     chips_label.pack(pady=(0, 30))
 
     start_button = ctk.CTkButton(main_frame, text="Start Game", font=("Arial", 16), corner_radius=10,
-                                 command=lambda: print(f"Game Started with {player.get_chips()} chips"))
+                                 command=lambda: show_frame(game_frame))
     start_button.pack(pady=15)
 
     settings_button = ctk.CTkButton(main_frame, text="Settings", font=("Arial", 16), corner_radius=10,
@@ -104,6 +106,45 @@ def create_settings_page():
                                 command=lambda: show_frame(main_frame))
     back_button.pack(pady=30)
 
+# Create the game layout
+def create_game_screen():
+    global game_frame
+
+    game_frame = ctk.CTkFrame(root, fg_color="transparent")
+    game_frame.pack(expand=True, fill="both", padx=20, pady=20)
+
+    title_label = ctk.CTkLabel(game_frame, text="Ultimate Texas Hold'em", font=("Arial", 28, "bold"))
+    title_label.pack(pady=(10, 20))
+
+    # Dealer Section
+    dealer_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
+    dealer_section.pack(pady=10)
+    dealer_title = ctk.CTkLabel(dealer_section, text="Dealer", font=("Arial", 16, "bold"))
+    dealer_title.pack(pady=(10, 5))
+    dealer_box = ctk.CTkFrame(dealer_section, width=160, height=100, fg_color="transparent")
+    dealer_box.pack(padx=20, pady=10)
+
+    # Community Section
+    community_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
+    community_section.pack(pady=10)
+    community_title = ctk.CTkLabel(community_section, text="Community Cards", font=("Arial", 16, "bold"))
+    community_title.pack(pady=(10, 5))
+    community_box = ctk.CTkFrame(community_section, width=400, height=100, fg_color="transparent")
+    community_box.pack(padx=20, pady=10)
+
+    # Player Section
+    player_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
+    player_section.pack(pady=10)
+    player_title = ctk.CTkLabel(player_section, text="Player", font=("Arial", 16, "bold"))
+    player_title.pack(pady=(10, 5))
+    player_box = ctk.CTkFrame(player_section, width=160, height=100, fg_color="transparent")
+    player_box.pack(padx=20, pady=10)
+
+    # Back button
+    back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
+                                command=lambda: show_frame(main_frame))
+    back_button.pack(pady=30)
+
 # Initialize the GUI application
 def start_gui():
     global root, logo_ctk_image
@@ -125,6 +166,7 @@ def start_gui():
 
     create_main_menu()
     create_settings_page()
+    create_game_screen()
 
     # Show the main menu right away
     show_frame(main_frame)
