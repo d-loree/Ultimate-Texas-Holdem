@@ -176,6 +176,19 @@ def create_game_screen():
     chips_label = ctk.CTkLabel(game_frame, textvariable=chips_var, font=("Arial", 20))
     chips_label.pack(pady=(10, 5))
 
+    # Chip amount selector buttons
+    chip_selector_frame = ctk.CTkFrame(game_frame, fg_color="transparent")
+    chip_selector_frame.pack(pady=(0, 10))
+
+    def create_chip_button(amount):
+        return ctk.CTkButton(chip_selector_frame, text=str(amount), width=60, font=("Arial", 14), corner_radius=20)
+
+    # Add buttons
+    for amount in [1, 10, 100, 1000, 10000]:
+        btn = create_chip_button(amount)
+        btn.pack(side="left", padx=5)
+
+
     # Back button
     back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
                                 command=lambda: show_frame(main_frame))
@@ -187,7 +200,7 @@ def start_gui():
 
     root = ctk.CTk()
     root.title("Ultimate Texas Hold'em")
-    root.geometry("1000x700")
+    root.geometry("1000x800")
 
     ctk.set_appearance_mode("dark")  # Default to dark mode
 
