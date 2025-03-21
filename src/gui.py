@@ -124,7 +124,7 @@ def create_game_screen():
 
     game_area.grid_columnconfigure(0, weight=0)  # player/community
     game_area.grid_columnconfigure(1, weight=1)  # spacing
-    game_area.grid_columnconfigure(2, weight=0)  # dealer/chips
+    game_area.grid_columnconfigure(2, weight=0)  # dealer/bet circles
 
     # Dealer + Community cards row
     community_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
@@ -141,7 +141,7 @@ def create_game_screen():
     dealer_box = ctk.CTkFrame(dealer_section, width=160, height=100, fg_color="transparent")
     dealer_box.pack(padx=20, pady=10)
 
-    # Player + Chips row
+    # Player row
     player_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
     player_section.grid(row=1, column=0, padx=(0, 20), pady=10, sticky="w")
     p_label = ctk.CTkLabel(player_section, text="Player", font=("Arial", 16, "bold"))
@@ -149,9 +149,32 @@ def create_game_screen():
     player_box = ctk.CTkFrame(player_section, width=160, height=100, fg_color="transparent")
     player_box.pack(padx=20, pady=10)
 
+    # ----- Betting Circles Layout -----
+    # Helper to create a circular chip slot
+    def create_bet_circle(parent, label_text):
+        container = ctk.CTkFrame(parent, fg_color="transparent")
+        container.pack(side="left", padx=10)
+
+        circle = ctk.CTkFrame(container, width=60, height=60, corner_radius=30, fg_color="#2e2e2e")
+        circle.pack()
+
+        label = ctk.CTkLabel(container, text=label_text, font=("Arial", 12))
+        label.pack(pady=(5, 0))
+
+    # Row 1: Ante + Blind (goes into same grid spot chips used to be in)
+    row1 = ctk.CTkFrame(game_area, fg_color="transparent")
+    row1.grid(row=1, column=2, pady=(0, 0))
+    create_bet_circle(row1, "Ante")
+    create_bet_circle(row1, "Blind")
+
+    # Row 2: Play
+    row2 = ctk.CTkFrame(game_area, fg_color="transparent")
+    row2.grid(row=2, column=2, pady=(0, 2))
+    create_bet_circle(row2, "Play")
+
     # Chips display
-    chips_label = ctk.CTkLabel(game_area, textvariable=chips_var, font=("Arial", 20))
-    chips_label.grid(row=1, column=2, padx=(20, 0), pady=(20, 10), sticky="n")
+    chips_label = ctk.CTkLabel(game_frame, textvariable=chips_var, font=("Arial", 20))
+    chips_label.pack(pady=(10, 5))
 
     # Back button
     back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
