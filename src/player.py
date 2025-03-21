@@ -41,3 +41,17 @@ def set_chips(value):
 # Reset chips to default value
 def reset_chips():
     set_chips(DEFAULT_CHIPS)
+
+# Add chips to current amount
+def add_chips(amount):
+    current = get_chips()
+    set_chips(current + int(amount))
+
+# Remove chips from current amount - wont go below 0
+def remove_chips(amount):
+    current = get_chips()
+    new_total = max(0, current - int(amount))
+    set_chips(new_total)
+
+def can_afford(amount):
+    return get_chips() >= int(amount)
