@@ -52,3 +52,6 @@ def remove_chips(amount):
     current = get_chips()
     new_total = max(0, current - int(amount))
     set_chips(new_total)
+
+def can_afford(amount):
+    return get_chips() >= int(amount)
