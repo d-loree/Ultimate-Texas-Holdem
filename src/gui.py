@@ -18,6 +18,8 @@ def show_frame(frame):
         chips_var.set(f"Chips: {player.get_chips()}")
     elif frame == settings_frame:
         chips_var.set(str(player.get_chips()))
+    elif frame == game_frame:
+        chips_var.set(f"{player.get_chips()} chips")
 
     main_frame.pack_forget()
     settings_frame.pack_forget()
@@ -116,34 +118,45 @@ def create_game_screen():
     title_label = ctk.CTkLabel(game_frame, text="Ultimate Texas Hold'em", font=("Arial", 28, "bold"))
     title_label.pack(pady=(10, 20))
 
-    # Dealer Section
-    dealer_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
-    dealer_section.pack(pady=10)
-    dealer_title = ctk.CTkLabel(dealer_section, text="Dealer", font=("Arial", 16, "bold"))
-    dealer_title.pack(pady=(10, 5))
+    # Centered game layout
+    game_area = ctk.CTkFrame(game_frame, fg_color="transparent")
+    game_area.pack()
+
+    game_area.grid_columnconfigure(0, weight=0)  # player/community
+    game_area.grid_columnconfigure(1, weight=1)  # spacing
+    game_area.grid_columnconfigure(2, weight=0)  # dealer/chips
+
+    # Dealer + Community cards row
+    community_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
+    community_section.grid(row=0, column=0, padx=(0, 20), pady=10, sticky="w")
+    c_label = ctk.CTkLabel(community_section, text="Community Cards", font=("Arial", 16, "bold"))
+    c_label.pack(pady=(10, 5))
+    community_box = ctk.CTkFrame(community_section, width=300, height=100, fg_color="transparent")
+    community_box.pack(padx=20, pady=10)
+
+    dealer_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
+    dealer_section.grid(row=0, column=2, padx=(20, 0), pady=10)
+    d_label = ctk.CTkLabel(dealer_section, text="Dealer", font=("Arial", 16, "bold"))
+    d_label.pack(pady=(10, 5))
     dealer_box = ctk.CTkFrame(dealer_section, width=160, height=100, fg_color="transparent")
     dealer_box.pack(padx=20, pady=10)
 
-    # Community Section
-    community_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
-    community_section.pack(pady=10)
-    community_title = ctk.CTkLabel(community_section, text="Community Cards", font=("Arial", 16, "bold"))
-    community_title.pack(pady=(10, 5))
-    community_box = ctk.CTkFrame(community_section, width=400, height=100, fg_color="transparent")
-    community_box.pack(padx=20, pady=10)
-
-    # Player Section
-    player_section = ctk.CTkFrame(game_frame, fg_color="#1e1e1e", corner_radius=12)
-    player_section.pack(pady=10)
-    player_title = ctk.CTkLabel(player_section, text="Player", font=("Arial", 16, "bold"))
-    player_title.pack(pady=(10, 5))
+    # Player + Chips row
+    player_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
+    player_section.grid(row=1, column=0, padx=(0, 20), pady=10, sticky="w")
+    p_label = ctk.CTkLabel(player_section, text="Player", font=("Arial", 16, "bold"))
+    p_label.pack(pady=(10, 5))
     player_box = ctk.CTkFrame(player_section, width=160, height=100, fg_color="transparent")
     player_box.pack(padx=20, pady=10)
+
+    # Chips display
+    chips_label = ctk.CTkLabel(game_area, textvariable=chips_var, font=("Arial", 20))
+    chips_label.grid(row=1, column=2, padx=(20, 0), pady=(20, 10), sticky="n")
 
     # Back button
     back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
                                 command=lambda: show_frame(main_frame))
-    back_button.pack(pady=30)
+    back_button.pack(pady=20)
 
 # Initialize the GUI application
 def start_gui():
@@ -151,7 +164,7 @@ def start_gui():
 
     root = ctk.CTk()
     root.title("Ultimate Texas Hold'em")
-    root.geometry("800x600")
+    root.geometry("1000x700")
 
     ctk.set_appearance_mode("dark")  # Default to dark mode
 
