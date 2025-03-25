@@ -304,21 +304,21 @@ def create_game_screen():
             start_button.pack(pady=5)
 
         if current_round == "Pre-Flop":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x3", command=advance_round)
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x3", command=lambda: bet_button_pressed(3))
             bet_button.pack(pady=5)
-            check_button = ctk.CTkButton(action_buttons_frame, text="x4", command=advance_round)
+            check_button = ctk.CTkButton(action_buttons_frame, text="x4", command=lambda: bet_button_pressed(4))
             check_button.pack(pady=5)
             check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
             check_button.pack(pady=5)
 
         elif current_round == "Flop":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x2", command=advance_round)
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x2", command=lambda: bet_button_pressed(2))
             bet_button.pack(pady=5)
             check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
             check_button.pack(pady=5)
 
         elif current_round == "Turn/River":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x1", command=advance_round)
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x1", command=lambda: bet_button_pressed(1))
             bet_button.pack(pady=5)
             check_button = ctk.CTkButton(action_buttons_frame, text="Fold", command=advance_round)
             check_button.pack(pady=5)
@@ -326,6 +326,18 @@ def create_game_screen():
         elif current_round == "Showdown":
             show_button = ctk.CTkButton(action_buttons_frame, text="Play Again", command=reset_game)
             show_button.pack(pady=5)
+
+    def bet_button_pressed(option):
+        if(option == 1):
+            advance_round()
+        if(option == 2):
+            advance_round()
+            advance_round()
+        if(option == 3 or option == 4):
+            advance_round()
+            advance_round()
+            advance_round()
+
 
     # Logic when advancing rounds
     def advance_round():
