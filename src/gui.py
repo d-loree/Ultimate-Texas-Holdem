@@ -332,18 +332,18 @@ def create_game_screen():
         if game.get_current_round() == "Bets":
             deck.set_shuffled_deck()
             player_cards = game.draw_starter_hands()
-            print(player_cards)
+            print("Bets = Player cards: ", player_cards)
         elif game.get_current_round() == "Pre-Flop":
             community_cards = game.draw_flop_hands()
-            print(community_cards)
+            print("Per-Flop = Community cards: ",community_cards)
         elif game.get_current_round() == "Flop":
             community_cards = game.draw_turn_slash_river()
-            print(community_cards)
+            print("Flop = Community cards: ",community_cards)
         elif game.get_current_round() == "Turn/River":
             dealer_cards = game.get_dealer_cards()
-            print(dealer_cards)
+            print("Turn/River = Dealer cards: ", dealer_cards)
             # Determine who wins here
-            print(game.determine_who_wins)
+            print(game.determine_who_wins())
 
         new_round = game.next_round()
         round_label.configure(text=f"Round: {new_round}")
