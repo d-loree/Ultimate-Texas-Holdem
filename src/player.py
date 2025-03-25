@@ -19,8 +19,10 @@ def load_player_data():
 
     if "chips" not in data:
         data["chips"] = DEFAULT_CHIPS
-        save_player_data(data)
+    if "chips_on_table" not in data:
+        data["chips_on_table"] = 0  # NEW: Tracks betted chips
 
+    save_player_data(data)
     return data
 
 # Save player data to file
@@ -55,3 +57,31 @@ def remove_chips(amount):
 
 def can_afford(amount):
     return get_chips() >= int(amount)
+
+# Get current chips on table
+def get_chips_on_table():
+    return load_player_data()["chips_on_table"]
+
+# Add chips to table and subtract from player
+def add_chips_to_table(amount):
+    if can_afford(amount):
+        data = load_player_data()
+        data["chips"] -= amount
+        data["chips_on_table"] += amount
+        save_player_data(data)
+        return True
+    return False
+
+# Return all chips from the table back to the player
+def return_chips_from_table():
+    data = load_player_data()
+    data["chips"] += data["chips_on_table"]
+    data["chips_on_table"] = 0
+    save_player_data(data)
+
+
+# Reset chips on table
+def reset_chips_on_table():
+    data = load_player_data()
+    data["chips_on_table"] = 0
+    save_player_data(data)

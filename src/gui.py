@@ -11,6 +11,21 @@ game_frame = None
 logo_ctk_image = None
 chips_var = None
 DEFAULT_CHIPS = player.DEFAULT_CHIPS
+selected_chip_amount = 1
+
+# Betting chip variables
+ante_bet_var = None
+blind_bet_var = None
+play_bet_var = None
+
+# Undo function to return chips from table to player
+def undo_bets():
+    player.return_chips_from_table()
+    chips_var.set(f"Chips: {player.get_chips()}")  # Update chips display
+    ante_bet_var.set("0")  # Reset bet labels
+    blind_bet_var.set("0")
+    play_bet_var.set("0")
+
 
 # Show the requested frame and hide the others (Also currently updates chips if on main menu)
 def show_frame(frame):
@@ -110,7 +125,7 @@ def create_settings_page():
 
 # Create the game layout
 def create_game_screen():
-    global game_frame
+    global game_frame, selected_chip_amount, ante_bet_var, blind_bet_var, play_bet_var
 
     game_frame = ctk.CTkFrame(root, fg_color="transparent")
     game_frame.pack(expand=True, fill="both", padx=20, pady=20)
@@ -149,61 +164,91 @@ def create_game_screen():
     player_box = ctk.CTkFrame(player_section, width=160, height=100, fg_color="transparent")
     player_box.pack(padx=20, pady=10)
 
-    # ----- Betting Circles Layout -----
-    # Helper to create a circular chip slot
+    # Betting values
+    ante_bet_var = ctk.StringVar(value="0")
+    blind_bet_var = ctk.StringVar(value="0")
+    play_bet_var = ctk.StringVar(value="0")
+
+    # Function to place bets
+    def place_bet(bet_var, label):
+        global selected_chip_amount
+
+        if label == "Play":
+            print("You cannot bet on Play at this stage.")
+            return  # Prevent placing Play bet
+
+        if player.add_chips_to_table(selected_chip_amount):
+            new_total = int(bet_var.get()) + selected_chip_amount
+            bet_var.set(str(new_total))
+            chips_var.set(f"Chips: {player.get_chips()}")
+        else:
+            print("Not enough chips!")
+
+    # Helper to create a betting chip slot
     def create_bet_circle(parent, label_text, bet_var):
         container = ctk.CTkFrame(parent, fg_color="transparent")
         container.pack(side="left", padx=10)
 
-        circle = ctk.CTkFrame(container, width=60, height=60, corner_radius=30, fg_color="#2e2e2e")
+        circle = ctk.CTkButton(container, width=60, height=60, corner_radius=30, fg_color="#2e2e2e",
+                               text="", command=lambda: place_bet(bet_var, label_text))
         circle.pack()
 
         label = ctk.CTkLabel(container, text=label_text, font=("Arial", 12))
         label.pack(pady=(5, 0))
 
-        # Bet value label that shows the bet placed
         bet_label = ctk.CTkLabel(container, textvariable=bet_var, font=("Arial", 12, "bold"))
         bet_label.pack(pady=(5, 0))
 
-    # Row 1: Ante + Blind (goes into same grid spot chips used to be in)
+    # Row 1: Ante + Blind
     row1 = ctk.CTkFrame(game_area, fg_color="transparent")
     row1.grid(row=1, column=2, pady=(0, 0))
-    ante_bet_var = ctk.StringVar(value="0") 
-    blind_bet_var = ctk.StringVar(value="0")  
     create_bet_circle(row1, "Ante", ante_bet_var)
     create_bet_circle(row1, "Blind", blind_bet_var)
 
     # Row 2: Play
     row2 = ctk.CTkFrame(game_area, fg_color="transparent")
     row2.grid(row=2, column=2, pady=(0, 2))
-    play_bet_var = ctk.StringVar(value="0")  
     create_bet_circle(row2, "Play", play_bet_var)
 
-    # Function to update the label with selected chip amount and update the bets
-    def update_chip_label(amount):
-        chip_display_label.configure(text=f"Selected {amount} chip bet size. Place your bet as you please.")
-        ante_bet_var.set(str(amount)) 
-        blind_bet_var.set(str(amount))  
-        play_bet_var.set(str(amount))  
-
-    # Chip amount selector buttons
+    # Chip amount selector
     chip_selector_frame = ctk.CTkFrame(game_frame, fg_color="transparent")
     chip_selector_frame.pack(pady=(0, 10))
 
+    # Undo button
+    undo_button = ctk.CTkButton(chip_selector_frame, text="Undo", width=60, font=("Arial", 14),
+                                fg_color="red", hover_color="#8B0000", corner_radius=20, command=undo_bets)
+    undo_button.pack(side="left", padx=5)
+
+
+    chip_buttons = []
+
+    def update_chip_button_styles():
+        for btn, amount in chip_buttons:
+            if amount == selected_chip_amount:
+                btn.configure(fg_color="#3ba336", text_color="white")  # selected
+            else:
+                btn.configure(fg_color="#2e2e2e", text_color="gray")   # unselected
+
     def create_chip_button(amount):
-        button = ctk.CTkButton(chip_selector_frame, text=str(amount), width=60, font=("Arial", 14), corner_radius=20, 
-                                command=lambda: update_chip_label(amount))
+        def on_select():
+            global selected_chip_amount
+            selected_chip_amount = amount
+            update_chip_button_styles()
+
+        button = ctk.CTkButton(chip_selector_frame, text=str(amount), width=60, font=("Arial", 14),
+                               corner_radius=20, command=on_select)
+        chip_buttons.append((button, amount))
         return button
 
-    # Add the label to display the chip selection message
-    chip_display_label = ctk.CTkLabel(game_frame, text="", font=("Arial", 18))
-    chip_display_label.pack(pady=(10, 20))
-
-    # Add buttons for chip amounts
-    for amount in [1, 10, 100, 1000, 10000]:
+    for amount in [1, 10, 100, 1000]:
         btn = create_chip_button(amount)
         btn.pack(side="left", padx=5)
 
+    update_chip_button_styles()
+
+    # Chips display
+    chips_label = ctk.CTkLabel(game_frame, textvariable=chips_var, font=("Arial", 20))
+    chips_label.pack(pady=(10, 5))
 
     # Back button
     back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
