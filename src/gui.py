@@ -151,7 +151,7 @@ def create_game_screen():
 
     # ----- Betting Circles Layout -----
     # Helper to create a circular chip slot
-    def create_bet_circle(parent, label_text):
+    def create_bet_circle(parent, label_text, bet_var):
         container = ctk.CTkFrame(parent, fg_color="transparent")
         container.pack(side="left", padx=10)
 
@@ -161,29 +161,45 @@ def create_game_screen():
         label = ctk.CTkLabel(container, text=label_text, font=("Arial", 12))
         label.pack(pady=(5, 0))
 
+        # Bet value label that shows the bet placed
+        bet_label = ctk.CTkLabel(container, textvariable=bet_var, font=("Arial", 12, "bold"))
+        bet_label.pack(pady=(5, 0))
+
     # Row 1: Ante + Blind (goes into same grid spot chips used to be in)
     row1 = ctk.CTkFrame(game_area, fg_color="transparent")
     row1.grid(row=1, column=2, pady=(0, 0))
-    create_bet_circle(row1, "Ante")
-    create_bet_circle(row1, "Blind")
+    ante_bet_var = ctk.StringVar(value="0") 
+    blind_bet_var = ctk.StringVar(value="0")  
+    create_bet_circle(row1, "Ante", ante_bet_var)
+    create_bet_circle(row1, "Blind", blind_bet_var)
 
     # Row 2: Play
     row2 = ctk.CTkFrame(game_area, fg_color="transparent")
     row2.grid(row=2, column=2, pady=(0, 2))
-    create_bet_circle(row2, "Play")
+    play_bet_var = ctk.StringVar(value="0")  
+    create_bet_circle(row2, "Play", play_bet_var)
 
-    # Chips display
-    chips_label = ctk.CTkLabel(game_frame, textvariable=chips_var, font=("Arial", 20))
-    chips_label.pack(pady=(10, 5))
+    # Function to update the label with selected chip amount and update the bets
+    def update_chip_label(amount):
+        chip_display_label.configure(text=f"Selected {amount} chip bet size. Place your bet as you please.")
+        ante_bet_var.set(str(amount)) 
+        blind_bet_var.set(str(amount))  
+        play_bet_var.set(str(amount))  
 
     # Chip amount selector buttons
     chip_selector_frame = ctk.CTkFrame(game_frame, fg_color="transparent")
     chip_selector_frame.pack(pady=(0, 10))
 
     def create_chip_button(amount):
-        return ctk.CTkButton(chip_selector_frame, text=str(amount), width=60, font=("Arial", 14), corner_radius=20)
+        button = ctk.CTkButton(chip_selector_frame, text=str(amount), width=60, font=("Arial", 14), corner_radius=20, 
+                                command=lambda: update_chip_label(amount))
+        return button
 
-    # Add buttons
+    # Add the label to display the chip selection message
+    chip_display_label = ctk.CTkLabel(game_frame, text="", font=("Arial", 18))
+    chip_display_label.pack(pady=(10, 20))
+
+    # Add buttons for chip amounts
     for amount in [1, 10, 100, 1000, 10000]:
         btn = create_chip_button(amount)
         btn.pack(side="left", padx=5)
@@ -221,3 +237,7 @@ def start_gui():
     show_frame(main_frame)
 
     root.mainloop()
+
+
+
+
