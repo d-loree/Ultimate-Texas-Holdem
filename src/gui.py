@@ -1,7 +1,7 @@
 # Handles GUI elements
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from src import player, game
+from src import player, game, deck
 
 # Global variables
 root = None
@@ -327,7 +327,24 @@ def create_game_screen():
             show_button = ctk.CTkButton(action_buttons_frame, text="Play Again", command=reset_game)
             show_button.pack(pady=5)
 
+    # Logic when advancing rounds
     def advance_round():
+        if game.get_current_round() == "Bets":
+            deck.set_shuffled_deck()
+            player_cards = game.draw_starter_hands()
+            print("Bets = Player cards: ", player_cards)
+        elif game.get_current_round() == "Pre-Flop":
+            community_cards = game.draw_flop_hands()
+            print("Per-Flop = Community cards: ",community_cards)
+        elif game.get_current_round() == "Flop":
+            community_cards = game.draw_turn_slash_river()
+            print("Flop = Community cards: ",community_cards)
+        elif game.get_current_round() == "Turn/River":
+            dealer_cards = game.get_dealer_cards()
+            print("Turn/River = Dealer cards: ", dealer_cards)
+            # Determine who wins here
+            print(game.determine_who_wins())
+
         new_round = game.next_round()
         round_label.configure(text=f"Round: {new_round}")
         update_action_buttons()
