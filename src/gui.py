@@ -1,7 +1,7 @@
 # Handles GUI elements
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from src import player
+from src import player, game
 
 # Global variables
 root = None
@@ -12,6 +12,9 @@ logo_ctk_image = None
 chips_var = None
 DEFAULT_CHIPS = player.DEFAULT_CHIPS
 selected_chip_amount = 1
+
+round_label = None
+action_buttons_frame = None
 
 # Betting chip variables
 ante_bet_var = None
@@ -125,13 +128,17 @@ def create_settings_page():
 
 # Create the game layout
 def create_game_screen():
-    global game_frame, selected_chip_amount, ante_bet_var, blind_bet_var, play_bet_var
+    global game_frame, selected_chip_amount, ante_bet_var, blind_bet_var, play_bet_var, round_label, action_buttons_frame, chip_selector_frame, bet_buttons
 
     game_frame = ctk.CTkFrame(root, fg_color="transparent")
     game_frame.pack(expand=True, fill="both", padx=20, pady=20)
 
     title_label = ctk.CTkLabel(game_frame, text="Ultimate Texas Hold'em", font=("Arial", 28, "bold"))
     title_label.pack(pady=(10, 20))
+
+    # Round Label
+    round_label = ctk.CTkLabel(game_frame, text=f"Round: {game.get_current_round()}", font=("Arial", 20))
+    round_label.pack(pady=(0, 10))
 
     # Centered game layout
     game_area = ctk.CTkFrame(game_frame, fg_color="transparent")
@@ -169,12 +176,14 @@ def create_game_screen():
     blind_bet_var = ctk.StringVar(value="0")
     play_bet_var = ctk.StringVar(value="0")
 
+    bet_buttons = {}
+
     def place_bet(label):
         global selected_chip_amount
 
-        if label == "Play":
-            print("You cannot bet on Play at this stage.")
-            return  # Prevent placing Play bet
+        if game.get_current_round() != "Bets":
+            print("Betting is only allowed in the Bets round.")
+            return
 
         total_bet = selected_chip_amount * 2
         if player.add_chips_to_table(total_bet):
@@ -190,9 +199,18 @@ def create_game_screen():
         container = ctk.CTkFrame(parent, fg_color="transparent")
         container.pack(side="left", padx=10)
 
-        circle = ctk.CTkButton(container, width=60, height=60, corner_radius=30, fg_color="#2e2e2e",
-                               text="", command=lambda: place_bet(label_text))
-        circle.pack()
+        is_play_circle = label_text == "Play"
+        
+        bet_button = ctk.CTkButton(
+            container, width=60, height=60, corner_radius=30, 
+            fg_color="#2e2e2e",
+            text="",
+            command=lambda: place_bet(label_text) if not is_play_circle else None,
+            hover=False if is_play_circle else True 
+        )
+        bet_button.pack()
+
+        bet_buttons[label_text] = bet_button
 
         label = ctk.CTkLabel(container, text=label_text, font=("Arial", 12))
         label.pack(pady=(5, 0))
@@ -211,7 +229,7 @@ def create_game_screen():
     row2.grid(row=2, column=2, pady=(0, 2))
     create_bet_circle(row2, "Play", play_bet_var)
 
-    # Chip amount selector
+    # Chip amount selector (Shown only in Bets round)
     chip_selector_frame = ctk.CTkFrame(game_frame, fg_color="transparent")
     chip_selector_frame.pack(pady=(0, 10))
 
@@ -223,12 +241,23 @@ def create_game_screen():
 
     chip_buttons = []
 
-    def update_chip_button_styles():
-        for btn, amount in chip_buttons:
-            if amount == selected_chip_amount:
-                btn.configure(fg_color="#3ba336", text_color="white")  # selected
+    # Show chip selector only during Bets round
+    def update_chip_selector_visibility():
+        if game.get_current_round() == "Bets":
+            chip_selector_frame.pack(pady=(0, 10))
+        else:
+            chip_selector_frame.pack_forget()
+
+    # Enable bet circles only in the Bets round
+    def update_bet_circles_state():
+        current_round = game.get_current_round()
+        is_enabled = (current_round == "Bets")
+
+        for button in bet_buttons.values():
+            if is_enabled:
+                button.configure(state="normal")
             else:
-                btn.configure(fg_color="#2e2e2e", text_color="gray")   # unselected
+                button.configure(state="disabled")
 
     def create_chip_button(amount):
         def on_select():
@@ -245,7 +274,70 @@ def create_game_screen():
         btn = create_chip_button(amount)
         btn.pack(side="left", padx=5)
 
+    def update_chip_button_styles():
+        for btn, amount in chip_buttons:
+            if amount == selected_chip_amount:
+                btn.configure(fg_color="#3ba336", text_color="white")  # selected
+            else:
+                btn.configure(fg_color="#2e2e2e", text_color="gray")   # unselected
+
     update_chip_button_styles()
+    update_chip_selector_visibility()
+    update_bet_circles_state()
+
+    # Round-based action buttons
+    action_buttons_frame = ctk.CTkFrame(game_frame, fg_color="transparent")
+    action_buttons_frame.pack(pady=10)
+
+    # Update action buttons and chip visibility based on the round 
+    def update_action_buttons():
+        for widget in action_buttons_frame.winfo_children():
+            widget.destroy()
+
+        update_chip_selector_visibility()
+        update_bet_circles_state()
+
+        current_round = game.get_current_round()
+
+        if current_round == "Bets":
+            start_button = ctk.CTkButton(action_buttons_frame, text="Deal", command=advance_round)
+            start_button.pack(pady=5)
+
+        if current_round == "Pre-Flop":
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x3", command=advance_round)
+            bet_button.pack(pady=5)
+            check_button = ctk.CTkButton(action_buttons_frame, text="x4", command=advance_round)
+            check_button.pack(pady=5)
+            check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
+            check_button.pack(pady=5)
+
+        elif current_round == "Flop":
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x2", command=advance_round)
+            bet_button.pack(pady=5)
+            check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
+            check_button.pack(pady=5)
+
+        elif current_round == "Turn/River":
+            bet_button = ctk.CTkButton(action_buttons_frame, text="x1", command=advance_round)
+            bet_button.pack(pady=5)
+            check_button = ctk.CTkButton(action_buttons_frame, text="Fold", command=advance_round)
+            check_button.pack(pady=5)
+
+        elif current_round == "Showdown":
+            show_button = ctk.CTkButton(action_buttons_frame, text="Play Again", command=reset_game)
+            show_button.pack(pady=5)
+
+    def advance_round():
+        new_round = game.next_round()
+        round_label.configure(text=f"Round: {new_round}")
+        update_action_buttons()
+
+    def reset_game():
+        game.reset_round()
+        round_label.configure(text=f"Round: {game.get_current_round()}")
+        update_action_buttons()
+
+    update_action_buttons()
 
     # Chips display
     chips_label = ctk.CTkLabel(game_frame, textvariable=chips_var, font=("Arial", 20))
