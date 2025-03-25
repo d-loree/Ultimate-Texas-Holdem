@@ -169,17 +169,18 @@ def create_game_screen():
     blind_bet_var = ctk.StringVar(value="0")
     play_bet_var = ctk.StringVar(value="0")
 
-    # Function to place bets
-    def place_bet(bet_var, label):
+    def place_bet(label):
         global selected_chip_amount
 
         if label == "Play":
             print("You cannot bet on Play at this stage.")
             return  # Prevent placing Play bet
 
-        if player.add_chips_to_table(selected_chip_amount):
-            new_total = int(bet_var.get()) + selected_chip_amount
-            bet_var.set(str(new_total))
+        total_bet = selected_chip_amount * 2
+        if player.add_chips_to_table(total_bet):
+            new_total = int(ante_bet_var.get()) + selected_chip_amount
+            ante_bet_var.set(str(new_total))
+            blind_bet_var.set(str(new_total))
             chips_var.set(f"Chips: {player.get_chips()}")
         else:
             print("Not enough chips!")
@@ -190,7 +191,7 @@ def create_game_screen():
         container.pack(side="left", padx=10)
 
         circle = ctk.CTkButton(container, width=60, height=60, corner_radius=30, fg_color="#2e2e2e",
-                               text="", command=lambda: place_bet(bet_var, label_text))
+                               text="", command=lambda: place_bet(label_text))
         circle.pack()
 
         label = ctk.CTkLabel(container, text=label_text, font=("Arial", 12))
