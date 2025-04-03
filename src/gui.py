@@ -126,6 +126,24 @@ def create_settings_page():
                                 command=lambda: show_frame(main_frame))
     back_button.pack(pady=30)
 
+
+def update_cards(box, cards):
+    for widget in box.winfo_children():
+        widget.destroy()
+
+    for card_path in cards:
+        if card_path:
+            card_image_path = f"assets/cards/{card_path}.png" 
+            try:
+                img = Image.open(card_image_path).resize((80, 120), Image.Resampling.LANCZOS)
+                ctk_img = ctk.CTkImage(light_image=img, size=(80, 120))
+                label = ctk.CTkLabel(box, image=ctk_img, text="")
+                label.image = ctk_img  
+                label.pack(side="left", padx=5)
+            except FileNotFoundError:
+                print(f"Error: {card_image_path} not found.")
+
+
 # Create the game layout
 def create_game_screen():
     global game_frame, selected_chip_amount, ante_bet_var, blind_bet_var, play_bet_var, round_label, action_buttons_frame, chip_selector_frame, bet_buttons
@@ -344,15 +362,19 @@ def create_game_screen():
         if game.get_current_round() == "Bets":
             deck.set_shuffled_deck()
             player_cards = game.draw_starter_hands()
+            update_cards(player_box,player_cards)
             print("Bets = Player cards: ", player_cards)
         elif game.get_current_round() == "Pre-Flop":
             community_cards = game.draw_flop_hands()
+            update_cards(community_box,community_cards)
             print("Per-Flop = Community cards: ",community_cards)
         elif game.get_current_round() == "Flop":
             community_cards = game.draw_turn_slash_river()
+            update_cards(community_box,community_cards)
             print("Flop = Community cards: ",community_cards)
         elif game.get_current_round() == "Turn/River":
             dealer_cards = game.get_dealer_cards()
+            update_cards(dealer_box,dealer_cards)
             print("Turn/River = Dealer cards: ", dealer_cards)
             # Determine who wins here
             print(game.determine_who_wins())
