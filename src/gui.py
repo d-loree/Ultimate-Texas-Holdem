@@ -16,6 +16,8 @@ selected_chip_amount = 1
 round_label = None
 action_buttons_frame = None
 
+back_button_game = None
+
 # Betting chip variables
 ante_bet_var = None
 blind_bet_var = None
@@ -261,10 +263,10 @@ def create_game_screen():
 
     # Show chip selector only during Bets round
     def update_chip_selector_visibility():
+        chip_selector_frame.pack_forget()
         if game.get_current_round() == "Bets":
-            chip_selector_frame.pack(pady=(0, 10))
-        else:
-            chip_selector_frame.pack_forget()
+            chip_selector_frame.pack(before=action_buttons_frame, pady=(0, 10))
+
 
     # Enable bet circles only in the Bets round
     def update_bet_circles_state():
@@ -345,6 +347,12 @@ def create_game_screen():
             show_button = ctk.CTkButton(action_buttons_frame, text="Play Again", command=reset_game)
             show_button.pack(pady=5)
 
+        if back_button_game:
+            if game.get_current_round() in ["Bets", "Showdown"]:
+                back_button_game.configure(state="normal")
+            else:
+                back_button_game.configure(state="disabled")
+
     def bet_button_pressed(option):
         if(option == 1):
             advance_round()
@@ -395,9 +403,11 @@ def create_game_screen():
     chips_label.pack(pady=(10, 5))
 
     # Back button
-    back_button = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
-                                command=lambda: show_frame(main_frame))
-    back_button.pack(pady=20)
+    global back_button_game
+    back_button_game = ctk.CTkButton(game_frame, text="Back to Menu", font=("Arial", 16), corner_radius=10,
+                                    command=lambda: show_frame(main_frame))
+    back_button_game.pack(pady=20)
+
 
 # Initialize the GUI application
 def start_gui():
