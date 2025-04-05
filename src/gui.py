@@ -324,24 +324,60 @@ def create_game_screen():
             start_button.pack(pady=5)
 
         if current_round == "Pre-Flop":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x3", command=lambda: bet_button_pressed(3))
-            bet_button.pack(pady=5)
-            check_button = ctk.CTkButton(action_buttons_frame, text="x4", command=lambda: bet_button_pressed(4))
-            check_button.pack(pady=5)
-            check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
-            check_button.pack(pady=5)
+            ante = int(ante_bet_var.get())
+
+            x3_btn = ctk.CTkButton(
+                action_buttons_frame,
+                text="x3",
+                command=(lambda: bet_button_pressed(3)) if player.can_afford(ante * 3) else None,
+                state="normal" if player.can_afford(ante * 3) else "disabled",
+                fg_color="#3a3a3a" if not player.can_afford(ante * 3) else None,
+                text_color="gray" if not player.can_afford(ante * 3) else None
+            )
+            x3_btn.pack(pady=5)
+
+            x4_btn = ctk.CTkButton(
+                action_buttons_frame,
+                text="x4",
+                command=(lambda: bet_button_pressed(4)) if player.can_afford(ante * 4) else None,
+                state="normal" if player.can_afford(ante * 4) else "disabled",
+                fg_color="#3a3a3a" if not player.can_afford(ante * 4) else None,
+                text_color="gray" if not player.can_afford(ante * 4) else None
+            )
+            x4_btn.pack(pady=5)
+
+            ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round).pack(pady=5)
 
         elif current_round == "Flop":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x2", command=lambda: bet_button_pressed(2))
-            bet_button.pack(pady=5)
-            check_button = ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round)
-            check_button.pack(pady=5)
+            ante = int(ante_bet_var.get())
+
+            x2_btn = ctk.CTkButton(
+                action_buttons_frame,
+                text="x2",
+                command=(lambda: bet_button_pressed(2)) if player.can_afford(ante * 2) else None,
+                state="normal" if player.can_afford(ante * 2) else "disabled",
+                fg_color="#3a3a3a" if not player.can_afford(ante * 2) else None,
+                text_color="gray" if not player.can_afford(ante * 2) else None
+            )
+            x2_btn.pack(pady=5)
+
+            ctk.CTkButton(action_buttons_frame, text="Check", command=advance_round).pack(pady=5)
 
         elif current_round == "Turn/River":
-            bet_button = ctk.CTkButton(action_buttons_frame, text="x1", command=lambda: bet_button_pressed(1))
-            bet_button.pack(pady=5)
-            check_button = ctk.CTkButton(action_buttons_frame, text="Fold", command=advance_round)
-            check_button.pack(pady=5)
+            ante = int(ante_bet_var.get())
+
+            x1_btn = ctk.CTkButton(
+                action_buttons_frame,
+                text="x1",
+                command=(lambda: bet_button_pressed(1)) if player.can_afford(ante * 1) else None,
+                state="normal" if player.can_afford(ante * 1) else "disabled",
+                fg_color="#3a3a3a" if not player.can_afford(ante * 1) else None,
+                text_color="gray" if not player.can_afford(ante * 1) else None
+            )
+            x1_btn.pack(pady=5)
+
+            ctk.CTkButton(action_buttons_frame, text="Fold", command=advance_round).pack(pady=5)
+
 
         elif current_round == "Showdown":
             show_button = ctk.CTkButton(action_buttons_frame, text="Play Again", command=reset_game)
@@ -353,16 +389,28 @@ def create_game_screen():
             else:
                 back_button_game.configure(state="disabled")
 
-    def bet_button_pressed(option):
-        if(option == 1):
-            advance_round()
-        if(option == 2):
-            advance_round()
-            advance_round()
-        if(option == 3 or option == 4):
-            advance_round()
-            advance_round()
-            advance_round()
+
+    def bet_button_pressed(multiplier):
+        required_chips = int(ante_bet_var.get()) * multiplier
+
+        if player.can_afford(required_chips):
+            player.remove_chips(required_chips)
+            play_bet_var.set(str(required_chips))
+            chips_var.set(f"{player.get_chips()} chips")
+
+            # Advance rounds
+            if(multiplier == 1):
+                advance_round()
+            if(multiplier == 2):
+                advance_round()
+                advance_round()
+            if(multiplier == 3 or multiplier == 4):
+                advance_round()
+                advance_round()
+                advance_round()
+        else:
+            print(f"Cannot afford a x{multiplier} bet. Required: {required_chips}, Available: {player.get_chips()}")
+            update_action_buttons()
 
 
     # Logic when advancing rounds
