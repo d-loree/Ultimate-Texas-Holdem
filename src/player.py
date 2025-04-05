@@ -27,6 +27,13 @@ def load_player_data():
     save_player_data(data)
     return data
 
+def clear_all_bets():
+    data = load_player_data()
+    data["ante_chips"] = 0
+    data["blind_chips"] = 0
+    data["play_chips"] = 0
+    save_player_data(data)
+
 # Save player data to file
 def save_player_data(data):
     with open(PLAYER_FILE, "w") as file:
