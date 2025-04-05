@@ -441,6 +441,12 @@ def create_game_screen():
 
     def reset_game():
         game.reset_round()
+        undo_bets()
+
+        update_cards(player_box, [])
+        update_cards(dealer_box, [])
+        update_cards(community_box, [])
+
         round_label.configure(text=f"Round: {game.get_current_round()}")
         update_action_buttons()
 
