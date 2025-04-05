@@ -9,6 +9,25 @@ player_cards = []
 dealer_cards = []
 community_cards = []
 
+PAYOUT_TABLE = {
+    10: 500,   # Royal Flush
+    9: 50,     # Straight Flush
+    8: 10,     # Four of a Kind
+    7: 3,      # Full House
+    6: 2,      # Flush
+    5: 1,      # Straight
+    4: 0,      # Three of a Kind or less = push on blind
+    3: 0,
+    2: 0,
+    1: 0
+}
+
+def resolve_game():
+    winner = determine_who_wins()
+    print(winner)
+
+
+
 # Get the current round name
 def get_current_round():
     return GAME_ROUNDS[current_round]
@@ -55,11 +74,11 @@ def determine_who_wins():
     dealer_best_hand = best_poker_hand(dealer_cards + community_cards)
 
     if player_best_hand > dealer_best_hand:
-        return f"Player wins with {hand_rank_to_string(player_best_hand)}!"
+        return ("player", player_best_hand[0])
     elif dealer_best_hand > player_best_hand:
-        return f"Dealer wins with {hand_rank_to_string(dealer_best_hand)}!"
+        return ("dealer", dealer_best_hand[0])
     else:
-        return f"It's a tie! Both have {hand_rank_to_string(player_best_hand)}."
+        return ("tie", player_best_hand[0])
 
 # Function to rank a hand
 def best_poker_hand(cards):

@@ -19,8 +19,10 @@ def load_player_data():
 
     if "chips" not in data:
         data["chips"] = DEFAULT_CHIPS
-    if "chips_on_table" not in data:
-        data["chips_on_table"] = 0  # NEW: Tracks betted chips
+
+    for field in ["ante_chips", "blind_chips", "play_chips"]:
+        if field not in data:
+            data[field] = 0
 
     save_player_data(data)
     return data
@@ -58,16 +60,21 @@ def remove_chips(amount):
 def can_afford(amount):
     return get_chips() >= int(amount)
 
-# Get current chips on table
-def get_chips_on_table():
-    return load_player_data()["chips_on_table"]
+# Add specific type of chips to table
+def add_ante_chips(amount):
+    return _add_to_table("ante_chips", amount)
 
-# Add chips to table and subtract from player
-def add_chips_to_table(amount):
+def add_blind_chips(amount):
+    return _add_to_table("blind_chips", amount)
+
+def add_play_chips(amount):
+    return _add_to_table("play_chips", amount)
+
+def _add_to_table(chip_type, amount):
     if can_afford(amount):
         data = load_player_data()
         data["chips"] -= amount
-        data["chips_on_table"] += amount
+        data[chip_type] += amount
         save_player_data(data)
         return True
     return False
@@ -75,13 +82,19 @@ def add_chips_to_table(amount):
 # Return all chips from the table back to the player
 def return_chips_from_table():
     data = load_player_data()
-    data["chips"] += data["chips_on_table"]
-    data["chips_on_table"] = 0
+    total_return = data["ante_chips"] + data["blind_chips"] + data["play_chips"]
+    data["chips"] += total_return
+    data["ante_chips"] = 0
+    data["blind_chips"] = 0
+    data["play_chips"] = 0
     save_player_data(data)
 
+# Get specific chip values
+def get_ante_chips():
+    return load_player_data()["ante_chips"]
 
-# Reset chips on table
-def reset_chips_on_table():
-    data = load_player_data()
-    data["chips_on_table"] = 0
-    save_player_data(data)
+def get_blind_chips():
+    return load_player_data()["blind_chips"]
+
+def get_play_chips():
+    return load_player_data()["play_chips"]

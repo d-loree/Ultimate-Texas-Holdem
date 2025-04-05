@@ -206,7 +206,9 @@ def create_game_screen():
             return
 
         total_bet = selected_chip_amount * 2
-        if player.add_chips_to_table(total_bet):
+        if player.can_afford(total_bet):
+            player.add_ante_chips(selected_chip_amount)
+            player.add_blind_chips(selected_chip_amount)
             new_total = int(ante_bet_var.get()) + selected_chip_amount
             ante_bet_var.set(str(new_total))
             blind_bet_var.set(str(new_total))
@@ -395,6 +397,7 @@ def create_game_screen():
 
         if player.can_afford(required_chips):
             player.remove_chips(required_chips)
+            player.add_play_chips(required_chips)
             play_bet_var.set(str(required_chips))
             chips_var.set(f"{player.get_chips()} chips")
 
@@ -432,8 +435,11 @@ def create_game_screen():
             dealer_cards = game.get_dealer_cards()
             update_cards(dealer_box,dealer_cards)
             print("Turn/River = Dealer cards: ", dealer_cards)
-            # Determine who wins here
-            print(game.determine_who_wins())
+            game.resolve_game()
+            chips_var.set(f"Chips: {player.get_chips()}")
+            ante_bet_var.set("0")
+            blind_bet_var.set("0")
+            play_bet_var.set("0")
 
         new_round = game.next_round()
         round_label.configure(text=f"Round: {new_round}")
@@ -441,7 +447,6 @@ def create_game_screen():
 
     def reset_game():
         game.reset_round()
-        undo_bets()
 
         update_cards(player_box, [])
         update_cards(dealer_box, [])
