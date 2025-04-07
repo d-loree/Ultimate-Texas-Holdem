@@ -425,7 +425,6 @@ def create_game_screen():
         required_chips = int(ante_bet_var.get()) * multiplier
 
         if player.can_afford(required_chips):
-            player.remove_chips(required_chips)
             player.add_play_chips(required_chips)
             play_bet_var.set(str(required_chips))
             chips_var.set(f"{player.get_chips()} chips")
