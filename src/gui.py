@@ -509,7 +509,7 @@ def start_gui():
 
     root = ctk.CTk()
     root.title("Ultimate Texas Hold'em")
-    root.geometry("1000x800")
+    root.geometry("1000x900")
 
     ctk.set_appearance_mode("dark")  # Default to dark mode
 
