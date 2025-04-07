@@ -236,6 +236,7 @@ def create_game_screen():
             chips_var.set(f"Chips: {player.get_chips()}")
         else:
             print("Not enough chips!")
+        update_action_buttons()
 
     # Helper to create a betting chip slot
     def create_bet_circle(parent, label_text, bet_var):
@@ -278,7 +279,7 @@ def create_game_screen():
 
     # Undo button
     undo_button = ctk.CTkButton(chip_selector_frame, text="Undo", width=60, font=("Arial", 14),
-                                fg_color="red", hover_color="#8B0000", corner_radius=20, command=undo_bets)
+                                fg_color="red", hover_color="#8B0000", corner_radius=20, command=lambda: (undo_bets(), update_action_buttons()))
     undo_button.pack(side="left", padx=5)
 
 
@@ -343,7 +344,14 @@ def create_game_screen():
         current_round = game.get_current_round()
 
         if current_round == "Bets":
-            start_button = ctk.CTkButton(action_buttons_frame, text="Deal", command=advance_round)
+            start_button = ctk.CTkButton(
+                action_buttons_frame,
+                text="Deal",
+                command=advance_round,
+                state="normal" if int(player.get_ante_chips()) > 0 else "disabled",
+                fg_color="#3a3a3a" if not int(player.get_ante_chips()) > 0 else None,
+                text_color="gray" if not int(player.get_ante_chips()) > 0 else None
+            )
             start_button.pack(pady=5)
 
         if current_round == "Pre-Flop":
