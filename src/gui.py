@@ -194,7 +194,8 @@ def create_game_screen():
     community_section.grid(row=0, column=0, padx=(0, 20), pady=10, sticky="w")
     c_label = ctk.CTkLabel(community_section, text="Community Cards", font=("Arial", 16, "bold"))
     c_label.pack(pady=(10, 5))
-    community_box = ctk.CTkFrame(community_section, width=300, height=100, fg_color="transparent")
+    community_box = ctk.CTkFrame(community_section, width=460, height=120, fg_color="transparent")
+    community_box.pack_propagate(False)
     community_box.pack(padx=20, pady=10)
 
     dealer_section = ctk.CTkFrame(game_area, fg_color="#1e1e1e", corner_radius=12)
