@@ -36,45 +36,37 @@ def has_folded():
 
 def resolve_game():
     if has_folded():
-        print("Player folded. Dealer wins automatically")
+        print("Player folded. Dealer wins automatically.")
         player.clear_all_bets()
-        return
-    
+        return "You folded. Dealer wins. All bets lost."
+
     winner, hand_rank = determine_who_wins()
-    print(f"{winner.upper()} wins with {hand_rank_to_string((hand_rank,))}!")
+    result = f"{winner.upper()} wins with {hand_rank_to_string((hand_rank,))}!"
 
     ante = player.get_ante_chips()
     blind = player.get_blind_chips()
     play = player.get_play_chips()
     payout_multiplier = PAYOUT_TABLE.get(hand_rank, 0)
-    print("Payout Multiplier: ")
-    print(payout_multiplier)
 
     if winner == "dealer":
-        # Player loses everything
-        print("Dealer wins. Player loses all bets.")
         player.clear_all_bets()
+        return f"{result}\nYou lost your bets: {ante + blind + play} chips."
 
     elif winner == "tie":
-        # Return bets
-        print("It's a tie. Bets returned.")
         player.add_chips(ante + blind + play)
         player.clear_all_bets()
+        return f"{result}\nIt's a tie. Your bets were returned."
 
     elif winner == "player":
-        print("Player wins!")
-        # Ante and Play both pay 1:1
         total_win = ante * 2 + play * 2
-
-        # Blind only pays if rank >= 5 (Straight or better)
         if hand_rank >= 5:
-            total_win += blind * PAYOUT_TABLE[hand_rank]
+            total_win += blind * payout_multiplier
         else:
-            total_win += blind  # Blind is pushed (returned)
+            total_win += blind  # Push
 
         player.add_chips(total_win)
         player.clear_all_bets()
-
+        return f"{result}\nReturn to player: {total_win} chips."
 
 # Get the current round name
 def get_current_round():

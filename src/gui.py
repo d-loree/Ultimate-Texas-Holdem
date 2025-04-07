@@ -128,6 +128,27 @@ def create_settings_page():
                                 command=lambda: show_frame(main_frame))
     back_button.pack(pady=30)
 
+def show_result_modal(result_text):
+    result_window = ctk.CTkToplevel()
+    result_window.title("Game Result")
+    result_window.geometry("400x300")
+
+    result_label = ctk.CTkLabel(result_window, text="Game Result", font=("Arial", 22, "bold"))
+    result_label.pack(pady=15)
+
+    message_label = ctk.CTkLabel(result_window, text=result_text, font=("Arial", 16), wraplength=350, justify="center")
+    message_label.pack(pady=10)
+
+    ok_button = ctk.CTkButton(result_window, text="OK", command=result_window.destroy)
+    ok_button.pack(pady=20)
+
+    def set_modal():
+        try:
+            result_window.grab_set()
+        except Exception as e:
+            print(f"Failed to set modal grab: {e}")
+
+    result_window.after(100, set_modal)
 
 def update_cards(box, cards):
     for widget in box.winfo_children():
@@ -438,7 +459,10 @@ def create_game_screen():
             dealer_cards = game.get_dealer_cards()
             update_cards(dealer_box,dealer_cards)
             print("Turn/River = Dealer cards: ", dealer_cards)
-            game.resolve_game()
+
+            result_text = game.resolve_game()
+            show_result_modal(result_text)
+
             chips_var.set(f"Chips: {player.get_chips()}")
             ante_bet_var.set("0")
             blind_bet_var.set("0")
