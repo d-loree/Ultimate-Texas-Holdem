@@ -5,6 +5,8 @@ from collections import Counter
 GAME_ROUNDS = ["Bets", "Pre-Flop", "Flop", "Turn/River", "Showdown"]
 current_round = 0 
 
+
+
 player_cards = []
 dealer_cards = []
 community_cards = []
@@ -22,7 +24,22 @@ PAYOUT_TABLE = {
     1: 0
 }
 
+player_folded = False
+
+def set_folded():
+    global player_folded
+    player_folded = True
+
+def has_folded():
+    return player_folded
+
+
 def resolve_game():
+    if has_folded():
+        print("Player folded. Dealer wins automatically")
+        player.clear_all_bets()
+        return
+    
     winner, hand_rank = determine_who_wins()
     print(f"{winner.upper()} wins with {hand_rank_to_string((hand_rank,))}!")
 
@@ -72,11 +89,12 @@ def next_round():
 
 # Reset the game round
 def reset_round():
-    global current_round, player_cards, dealer_cards, community_cards
+    global current_round, player_cards, dealer_cards, community_cards, player_folded
     current_round = 0
     player_cards = []
     dealer_cards = []
     community_cards = []
+    player_folded = False
 
 # Return player hands
 def draw_starter_hands():

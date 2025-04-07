@@ -378,7 +378,7 @@ def create_game_screen():
             )
             x1_btn.pack(pady=5)
 
-            ctk.CTkButton(action_buttons_frame, text="Fold", command=advance_round).pack(pady=5)
+            ctk.CTkButton(action_buttons_frame, text="Fold", command=player_folds).pack(pady=5)
 
 
         elif current_round == "Showdown":
@@ -415,6 +415,9 @@ def create_game_screen():
             print(f"Cannot afford a x{multiplier} bet. Required: {required_chips}, Available: {player.get_chips()}")
             update_action_buttons()
 
+    def player_folds():
+        game.set_folded()
+        advance_round()
 
     # Logic when advancing rounds
     def advance_round():
