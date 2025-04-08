@@ -1,3 +1,6 @@
 *.pyc
 *.pyo
 player.json
+build
+dist
+main.spec
