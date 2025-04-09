@@ -98,6 +98,23 @@ def create_main_menu():
                                 fg_color="red", hover_color="#8B0000", command=root.quit)
     quit_button.pack(pady=15)
 
+    # Payout Table Header
+    payout_title = ctk.CTkLabel(main_frame, text="Blind Payout Table:", font=("Arial", 20, "bold"))
+    payout_title.pack(pady=(10, 5))
+
+    # Payout Table Content
+    payout_text = """
+Royal Flush        - 500x
+Straight Flush     - 50x
+Four of a Kind     - 10x
+Full House         - 3x
+Flush              - 2x
+Straight           - 1x
+Lower              - Push
+    """
+    payout_label = ctk.CTkLabel(main_frame, text=payout_text.strip(), font=("Courier", 16), justify="left")
+    payout_label.pack(pady=(0, 30))
+
 # Create the settings page layout
 def create_settings_page():
     global settings_frame, chips_var, seed_var
