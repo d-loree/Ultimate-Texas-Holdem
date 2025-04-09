@@ -9,7 +9,20 @@ A Python-based Ultimate Texas Hold'em game with a graphical interface built usin
   <img src="assets/chips/blue-chip.png" width="150">
 </p>
 
-## Prerequisites
+## ⚠️ Important Note
+
+Running the game directly with Python (`python main.py`) is no longer supported.  
+You must **bake the project into an executable** for it to function properly.
+
+Use a tool like [PyInstaller](https://pyinstaller.org/en/stable/) to create a standalone `.exe` or binary file, or download a prebuilt executable below.
+
+## 🖥️ Run the Game (Executable)
+
+Executables for Windows, Mac and Fedora are available inside the [`executables/`](./executables) directory — no Python install required. Just run the file.
+
+
+## 🐍 Run from Source (Deprecated)
+### Prerequisites
 
 - Python 3.10 or newer
 - Python dependencies:
@@ -17,13 +30,13 @@ A Python-based Ultimate Texas Hold'em game with a graphical interface built usin
   - Pillow
   - python-dotenv
 
-### Install dependencies:
+### Install Python Dependencies:
 
 ```bash
 pip install customtkinter Pillow python-dotenv
 ```
 
-## Setup
+### Run
 
 Run the game from the project's main directory:
 ```
