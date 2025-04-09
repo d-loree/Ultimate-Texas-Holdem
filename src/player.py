@@ -4,15 +4,25 @@ import json
 import os
 from dotenv import load_dotenv
 
+import os
+import sys
 load_dotenv()
 
-PLAYER_FILE = "src/player.json"
+
+
 DEFAULT_CHIPS = int(os.getenv("DEFAULT_CHIPS", 10000))
+
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+player_file = resource_path("src/player.json")
 
 # Load player data from file or create default
 def load_player_data():
+    player_file = resource_path("src/player.json")
     try:
-        with open(PLAYER_FILE, "r") as file:
+        with open(player_file, "r") as file:
             data = json.load(file)
     except FileNotFoundError:
         data = {}
@@ -36,7 +46,7 @@ def clear_all_bets():
 
 # Save player data to file
 def save_player_data(data):
-    with open(PLAYER_FILE, "w") as file:
+    with open(player_file, "w") as file:
         json.dump(data, file)
 
 # Get current chip count

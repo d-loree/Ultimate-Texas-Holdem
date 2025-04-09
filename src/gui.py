@@ -2,7 +2,8 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
 from src import player, game, deck
-
+import os
+import sys
 # Global variables
 root = None
 main_frame = None
@@ -24,6 +25,12 @@ back_button_game = None
 ante_bet_var = None
 blind_bet_var = None
 play_bet_var = None
+
+
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
 
 # Undo function to return chips from table to player
 def undo_bets():
@@ -181,7 +188,8 @@ def update_cards(box, cards):
 
     for card_path in cards:
         if card_path:
-            card_image_path = f"assets/cards/{card_path}.png" 
+            card_image_path = "assets/cards/{card_path}.png"
+            card_image_path = resource_path(card_image_path) 
             try:
                 img = Image.open(card_image_path).resize((80, 120), Image.Resampling.LANCZOS)
                 ctk_img = ctk.CTkImage(light_image=img, size=(80, 120))
@@ -545,6 +553,7 @@ def start_gui():
 
     # Load logo
     logo_path = "assets/logo.png"
+    logo_path = resource_path(logo_path)
     original_width, original_height = 384, 191
     new_width = 300
     new_height = int((new_width / original_width) * original_height)
