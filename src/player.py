@@ -16,11 +16,11 @@ def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
-player_file = resource_path("src/player.json")
+player_file = resource_path("player.json")
 
 # Load player data from file or create default
 def load_player_data():
-    player_file = resource_path("src/player.json")
+    player_file = resource_path("player.json")
     try:
         with open(player_file, "r") as file:
             data = json.load(file)

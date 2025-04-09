@@ -19,7 +19,7 @@ deck_of_cards = {
     "ace_of_clubs", "ace_of_diamonds", "ace_of_hearts", "ace_of_spades"
 }
 shuffled_array = None
-CARD_DIR = "assets/cards"
+CARD_DIR = "../assets/cards"
 
 # Pop next card off shuffled deck
 def get_random_card():
