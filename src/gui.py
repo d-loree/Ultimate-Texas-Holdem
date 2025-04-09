@@ -206,7 +206,7 @@ def update_cards(box, cards):
     for card_path in cards:
         if card_path:
             card_image_path = f"../assets/cards/{card_path}.png"
-            card_image_path = resource_path(card_image_path) 
+            card_image_path = resource_path(os.path.join("assets", "cards", f"{card_path}.png"))
             try:
                 img = Image.open(card_image_path).resize((80, 120), Image.Resampling.LANCZOS)
                 ctk_img = ctk.CTkImage(light_image=img, size=(80, 120))
@@ -570,7 +570,7 @@ def start_gui():
 
     # Load logo
     logo_path = "../assets/logo.png"
-    logo_path = resource_path(logo_path)
+    logo_path = resource_path(os.path.join("assets", "logo.png"))
     original_width, original_height = 384, 191
     new_width = 300
     new_height = int((new_width / original_width) * original_height)
