@@ -13,6 +13,8 @@ chips_var = None
 DEFAULT_CHIPS = player.DEFAULT_CHIPS
 selected_chip_amount = 1
 
+seed_var = None
+
 round_label = None
 action_buttons_frame = None
 
@@ -91,7 +93,7 @@ def create_main_menu():
 
 # Create the settings page layout
 def create_settings_page():
-    global settings_frame, chips_var
+    global settings_frame, chips_var, seed_var
 
     settings_frame = ctk.CTkFrame(root, fg_color="transparent")
     settings_frame.pack(expand=True, fill="both", padx=20, pady=20)
@@ -122,6 +124,29 @@ def create_settings_page():
     reset_button = ctk.CTkButton(settings_frame, text=f"Reset to {DEFAULT_CHIPS}", font=("Arial", 16), corner_radius=10,
                                  command=reset_chips_gui)
     reset_button.pack(pady=10)
+
+    # Seed input
+    seed_var = ctk.StringVar()
+    seed_label = ctk.CTkLabel(settings_frame, text="Deterministic Seed (Optional):", font=("Arial", 16))
+    seed_label.pack()
+
+    seed_entry = ctk.CTkEntry(settings_frame, textvariable=seed_var, font=("Arial", 16))
+    seed_entry.pack(pady=10)
+
+    def save_seed_gui():
+        seed = seed_var.get().strip()
+        if seed.isdigit():
+            deck.set_shuffled_deck(seed=int(seed))
+            print(f"Seed set to {seed}")
+        elif seed == "":
+            deck.set_shuffled_deck()
+            print("Seed cleared — using random shuffle.")
+        else:
+            print("Invalid seed: Please enter a number.")
+
+    save_seed_button = ctk.CTkButton(settings_frame, text="Save Seed", font=("Arial", 16), corner_radius=10,
+                                     command=save_seed_gui)
+    save_seed_button.pack(pady=10)
 
     # Back button
     back_button = ctk.CTkButton(settings_frame, text="Back", font=("Arial", 16), corner_radius=10,
@@ -451,7 +476,12 @@ def create_game_screen():
     # Logic when advancing rounds
     def advance_round():
         if game.get_current_round() == "Bets":
-            deck.set_shuffled_deck()
+            if seed_var and seed_var.get().strip().isdigit():
+                deck.set_shuffled_deck(seed=int(seed_var.get().strip()))
+                print(f"Shuffling deck with seed: {seed_var.get().strip()}")
+            else:
+                deck.set_shuffled_deck()
+                print("Shuffling deck randomly (no seed)")
             player_cards = game.draw_starter_hands()
             update_cards(player_box,player_cards)
             print("Bets = Player cards: ", player_cards)

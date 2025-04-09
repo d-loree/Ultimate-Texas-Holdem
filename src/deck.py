@@ -32,7 +32,9 @@ def discard_a_card():
         shuffled_array.pop()
 
 # Sets shuffled deck in memory
-def set_shuffled_deck():
+def set_shuffled_deck(seed=None):
     global shuffled_array
     shuffled_array = list(deck_of_cards)
+    if seed is not None:
+        random.seed(seed)
     random.shuffle(shuffled_array)
